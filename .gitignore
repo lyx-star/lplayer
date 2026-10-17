@@ -1,0 +1,38 @@
+## .NET
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+publish/
+publish-sc/
+out/
+
+## IDE
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+
+## OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## 发布产物（源码仓库不提交二进制包）
+*.zip
+lplayer-selfcontained*/
+lplayer-v*/
+
+## NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## 测试
+TestResults/
+*.trx

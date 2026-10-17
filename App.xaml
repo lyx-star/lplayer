@@ -1,0 +1,10 @@
+<Application x:Class="lplayer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <!-- MiSans：多字重打包为同一 FontFamily，WPF 按 FontWeight 自动选 -->
+        <FontFamily x:Key="AppFont">./Assets/Fonts/#MiSans</FontFamily>
+        <FontFamily x:Key="AppFontMono">Cascadia Mono, Consolas, MiSans, monospace</FontFamily>
+    </Application.Resources>
+</Application>

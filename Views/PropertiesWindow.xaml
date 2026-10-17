@@ -1,0 +1,74 @@
+<Window x:Class="lplayer.Views.PropertiesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="音频属性 — lplayer"
+        Width="420" Height="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#FAFAFA"
+        Foreground="#111111"
+        FontFamily="{StaticResource AppFont}"
+        FontSize="13">
+    <Window.Resources>
+        <Style x:Key="KeyText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#777777"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+        </Style>
+        <Style x:Key="ValText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#111111"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,2,0,0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24,18,24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <TextBlock Text="文件名" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding FileName}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="完整路径" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding FilePath}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="文件大小" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding FileSizeText}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="格式" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding Format}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="编码" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding Codec}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="采样率" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding SampleRateText}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="位深度" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding BitsPerSampleText}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="声道" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding ChannelsText}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="比特率" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding BitrateText}" Style="{StaticResource ValText}"/>
+
+                <TextBlock Text="总时长" Style="{StaticResource KeyText}"/>
+                <TextBlock Text="{Binding DurationText}" Style="{StaticResource ValText}"
+                           FontFamily="{StaticResource AppFontMono}"/>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <Button Grid.Row="1" Content="关闭" HorizontalAlignment="Right" Margin="0,16,0,0"
+                Padding="24,8" Background="Transparent" Foreground="#111111"
+                BorderBrush="#CCCCCC" BorderThickness="1" Cursor="Hand"
+                Click="Close_Click"/>
+    </Grid>
+</Window>

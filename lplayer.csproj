@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>lplayer</AssemblyName>
+    <RootNamespace>lplayer</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>lyx-star</Authors>
+    <Product>lplayer</Product>
+    <Description>Lightweight local music player</Description>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <PublishTrimmed>false</PublishTrimmed>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <!-- Default: NuGet -->
+  <ItemGroup Condition="'$(UseLocalLibs)' != 'true'">
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+  </ItemGroup>
+
+  <!-- Offline: direct DLL refs (lib/) -->
+  <ItemGroup Condition="'$(UseLocalLibs)' == 'true'">
+    <Reference Include="NAudio.Core">
+      <HintPath>$(MSBuildProjectDirectory)\lib\NAudio.Core.dll</HintPath>
+      <Private>true</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="NAudio.Wasapi">
+      <HintPath>$(MSBuildProjectDirectory)\lib\NAudio.Wasapi.dll</HintPath>
+      <Private>true</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="NAudio.WinMM">
+      <HintPath>$(MSBuildProjectDirectory)\lib\NAudio.WinMM.dll</HintPath>
+      <Private>true</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="NAudio.Vorbis">
+      <HintPath>$(MSBuildProjectDirectory)\lib\NAudio.Vorbis.dll</HintPath>
+      <Private>true</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="NVorbis">
+      <HintPath>$(MSBuildProjectDirectory)\lib\NVorbis.dll</HintPath>
+      <Private>true</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\avatar.png" Condition="Exists('Assets\avatar.png')" />
+    <Resource Include="Assets\Fonts\*.ttf" />
+  </ItemGroup>
+
+</Project>
