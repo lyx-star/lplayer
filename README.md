@@ -117,10 +117,6 @@ lplayer/
 在 **设置 → 一键关联支持的音频格式** 中，将常见音频扩展名指向 lplayer（写入 `HKCU\Software\Classes`）。  
 Windows 11 可能仍要求在「默认应用」中确认一次。
 
-## 关于作者
-
-**lyx-star**  
-GitHub：[https://github.com/lyx-star](https://github.com/lyx-star)
 
 ## 许可
 
