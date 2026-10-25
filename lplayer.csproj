@@ -10,7 +10,7 @@
     <RootNamespace>lplayer</RootNamespace>
     <ApplicationIcon>Assets\lplayer.ico</ApplicationIcon>
     <Version>1.0.0</Version>
-    <Authors>lyx-star</Authors>
+    <Authors>lyx</Authors>
     <Product>lplayer</Product>
     <Description>Lightweight local music player</Description>
     <SelfContained>false</SelfContained>

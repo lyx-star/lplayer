@@ -69,7 +69,7 @@
                     <TextBlock Text="作者"
                                FontSize="11" Foreground="#777777"
                                Margin="0,0,0,2"/>
-                    <TextBlock Text="lyx-star"
+                    <TextBlock Text="lyx"
                                FontSize="15" FontWeight="SemiBold"
                                Foreground="#111111"/>
                     <TextBlock Margin="0,6,0,0">

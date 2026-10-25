@@ -1,129 +1,138 @@
 # lplayer
 
-<p align="center">
-  <b>轻量、纯粹的本地音乐播放器</b><br/>
-  只做播放，别无冗余
-</p>
+轻量、纯粹的本地音乐播放器。**只做播放，别无冗余。**
 
-<p align="center">
-  <img alt="Windows" src="https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D6?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4OCA4OCI+PHBhdGggZmlsbD0iIzAwNzhENiIgZD0iTTAsMGg0MXY0MEgweiIvPjxwYXRoIGZpbGw9IiMwMDc4RDYiIGQ9Ik00OCwwaDQwdjQwSDQ4eiIvPjxwYXRoIGZpbGw9IiMwMDc4RDYiIGQ9Ik0wLDQ4aDQxdjQwSDB6Ii8+PHBhdGggZmlsbD0iIzAwNzhENiIgZD0iTTQ4LDQ4aDQwdjQwSDQ4eiIvPvc="/>
-  <img alt=".NET" src="https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet">
-  <img alt="NAudio" src="https://img.shields.io/badge/audio-NAudio-FF6A00">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
-</p>
-
----
-
-## 简介
-
-**lplayer** 是一款面向 Windows 的轻量级本地音乐播放器。
-
-没有播放列表管理、没有歌词、没有均衡器、没有网络和账号——  
-打开文件、看波形、拖进度、听歌，仅此而已。
-
-适合希望「双击就能听、界面干净、冷启动快」的场景。
+- 应用名：`lplayer`
+- 作者：[lyx](https://github.com/lyx-star)
+- 技术：C# + WPF（.NET 8）+ NAudio
+- 定位：本地音频文件播放；无播放列表 / 歌词 / 均衡器 / 网络 / 账号
 
 ## 功能
 
-- 🎵 播放本地音频：**MP3 / WAV / FLAC / M4A / AAC / OGG / WMA**
-- 🌊 自绘**波形进度条**，点击 / 拖动定位，拖动时实时显示时间
-- ⏯ 播放 / 暂停、时移跳转、倍速（0.5x–2.0x）
-- 🎛 音频属性面板（编码、采样率、比特率、时长等）
-- 📁 拖入文件播放；支持命令行参数与文件关联
-- 🖼 内置 **MiSans** 字体
-- ⚡ 启动快、资源占用低（峰值波形，不缓存整段 PCM）
+- 播放本地音频：MP3、WAV、FLAC、M4A/AAC、OGG、WMA
+- 自绘波形进度条（点击 / 拖动定位）
+- 播放 / 暂停、从头开始、前后时移、倍速、音量 / 静音
+- 时间显示精确到 0.01s；短于 60 分钟为 `mm:ss.xx`，达到 1 小时为 `hh:mm:ss.xx`
+- 音频属性面板、主题（深 / 浅）、设置持久化
+- 拖入文件播放；命令行参数 / 文件关联启动
+- 快捷键：空格播放暂停，`←` `→` 时移，`↑` `↓` 音量，`M` 静音
 
-## 界面
+## 环境要求
 
-| 主界面 | 设置 | 关于 |
-|--------|------|------|
-| 波形 + 播放控制 + 时间 | 时移时长、文件关联 | 作者 lyx-star |
+- Windows 10/11 x64
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)（构建时）
+- 运行时：自包含发布无需安装 .NET；框架依赖发布需本机 .NET 8 Desktop Runtime
 
-## 快捷键
+## 构建
 
-| 按键 | 作用 |
-|------|------|
-| `空格` | 播放 / 暂停 |
-| `←` / `→` | 后退 / 前进时移（时长可在设置中调整） |
+### 开发调试
 
-## 下载与运行
-
-### 方式一：自包含版（推荐分发）
-
-下载 **`lplayer-selfcontained-win-x64.zip`**，解压后双击 `lplayer.exe`。
-
-- ✅ 目标电脑**无需安装** .NET 或其它运行时  
-- ❌ 不能用于 ARM 设备；仅 **Windows 10/11 x64**
-
-### 方式二：框架依赖版（体积更小）
-
-需本机已安装 [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)。
-
-## 从源码构建
-
-```bash
-git clone https://github.com/lyx-star/lplayer.git
+```powershell
 cd lplayer
 dotnet build -c Release
+dotnet run -c Release
 ```
 
-### 发布单文件（框架依赖）
+### 发布单文件（推荐）
 
-```bash
-dotnet publish -c Release -r win-x64 \
-  -p:PublishSingleFile=true \
-  -p:SelfContained=false \
-  -o publish
+**框架依赖（体积更小，需本机 .NET 8 Desktop Runtime）：**
+
+```powershell
+dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=false -o publish
 ```
 
-### 发布自包含（目标机零依赖）
+产物：`publish\lplayer.exe`（通常约 150KB 左右 + 本机运行时）
 
-```bash
-dotnet publish -c Release -r win-x64 \
-  -p:PublishSingleFile=true \
-  -p:SelfContained=true \
-  -o publish-sc
+**自包含单文件（目标机器可无 .NET 直接运行，体积较大）：**
+
+```powershell
+dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=true -o publish-sc
 ```
+
+产物：`publish-sc\lplayer.exe`
+
+### 指定输出目录示例
+
+```powershell
+dotnet publish lplayer.csproj -c Release -r win-x64 `
+  -p:PublishSingleFile=true `
+  -p:SelfContained=false `
+  -p:IncludeNativeLibrariesForSelfExtract=true `
+  -p:EnableCompressionInSingleFile=true `
+  -o out
+```
+
+## 使用
+
+1. 运行 `lplayer.exe`
+2. 将音频文件拖入窗口，或通过资源管理器双击已关联的音频文件
+3. 命令行：
+
+```powershell
+.\lplayer.exe "D:\Music\song.mp3"
+```
+
+### 文件关联
+
+「设置 → 一键关联支持的音频格式」写入 `HKCU\Software\Classes` 下的 ProgID（`lplayer.Audio`）与扩展名映射。  
+Windows 11 对默认应用有系统保护（UserChoice Hash），关联后若仍提示选择，请在 **设置 → 应用 → 默认应用** 中选择 lplayer。
+
+「解除关联」可恢复。
+
+### 头像
+
+关于页头像路径：`Assets/avatar.png`（发布后位于程序目录 `Assets\avatar.png`）。  
+替换该文件即可显示真实头像；缺失时显示占位图标，不会报错。
+
+> 注意：单文件自包含发布时，非 `Resource` 的松散文件不会自动打入 exe。请将 `avatar.png` 复制到 exe 旁的 `Assets\` 目录，或在 csproj 中保持 `<Resource Include="Assets\avatar.png" />` 并通过 pack URI 加载（当前代码优先读程序目录，便于用户直接替换）。
+
+## 配置文件
+
+```
+%AppData%\lplayer\settings.json
+```
+
+保存主题、音量、倍速、时移时长、静音状态。
 
 ## 项目结构
 
 ```
 lplayer/
-├── App.xaml                 # 应用入口与全局字体
-├── Controls/
-│   └── WaveformControl.cs   # 波形自绘控件
-├── Helpers/
-│   └── TimeFormatter.cs     # mm:ss.xx / hh:mm:ss.xx
-├── Models/                  # 设置与音频元数据
-├── Services/                # 播放 / 波形 / 设置 / 注册表关联
-├── ViewModels/              # MVVM
-├── Views/                   # 主窗口、设置、关于、属性
-└── Assets/
-    ├── avatar.png           # 关于页头像（可替换）
-    └── Fonts/               # MiSans
+├── lplayer.csproj
+├── App.xaml / App.xaml.cs
+├── Assets/avatar.png
+├── Controls/WaveformControl.cs     # 波形自绘控件
+├── Helpers/TimeFormatter.cs        # 时间格式 mm:ss.xx / hh:mm:ss.xx
+├── Models/
+│   ├── AppSettings.cs
+│   └── AudioFileInfo.cs
+├── Services/
+│   ├── AudioPlayerService.cs       # NAudio 播放
+│   ├── WaveformService.cs          # 后台峰值解析
+│   ├── SettingsService.cs          # settings.json
+│   ├── FileAssociationService.cs   # 注册表关联
+│   └── SpeedSampleProvider.cs      # 倍速
+├── ViewModels/
+│   ├── MainViewModel.cs
+│   ├── SettingsViewModel（位于 SettingsWindow.xaml.cs）
+│   └── RelayCommand.cs
+└── Views/
+    ├── MainWindow.xaml(.cs)
+    ├── SettingsWindow.xaml(.cs)
+    ├── AboutWindow.xaml(.cs)
+    └── PropertiesWindow.xaml(.cs)
 ```
 
-## 技术栈
+## 架构
 
-| 层 | 技术 |
-|----|------|
-| UI | WPF (.NET 8) + 原生 XAML 自绘 |
-| 音频 | NAudio（WaveOut / Media Foundation / Vorbis） |
-| 架构 | MVVM（ViewModel / Service / View 分离） |
-| 配置 | `%AppData%\lplayer\settings.json` |
-
-## 文件关联
-
-在 **设置 → 一键关联支持的音频格式** 中，将常见音频扩展名指向 lplayer（写入 `HKCU\Software\Classes`）。  
-Windows 11 可能仍要求在「默认应用」中确认一次。
-
+```
+View (XAML)  ←binding→  ViewModel  ←interface→  Service
+                                              ├─ AudioPlayerService (NAudio)
+                                              ├─ WaveformService (后台峰值)
+                                              ├─ SettingsService
+                                              └─ FileAssociationService
+```
 
 ## 许可
 
-本项目采用 [MIT License](LICENSE) 发布（若仓库未附 LICENSE 文件，可自行补充）。
-
----
-
-<p align="center">
-  轻量、纯粹的本地音乐播放器 · <b>lplayer</b>
-</p>
+按作者仓库惯例使用。作者主页：https://github.com/lyx-star
