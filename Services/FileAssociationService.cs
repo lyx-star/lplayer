@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
 namespace lplayer.Services;
@@ -27,11 +28,25 @@ public sealed class FileAssociationService : IFileAssociationService
         Environment.ProcessPath
         ?? Path.Combine(AppContext.BaseDirectory, "lplayer.exe");
 
+    private static string BaseDir =>
+        Path.GetDirectoryName(ExePath) ?? AppContext.BaseDirectory;
+
+    /// <summary>图标资源：优先 lplayer.ico（已随程序输出），否则用 exe 内嵌图标。</summary>
+    private static string IconLocation
+    {
+        get
+        {
+            var ico = Path.Combine(BaseDir, "lplayer.ico");
+            if (File.Exists(ico))
+                return $"\"{ico}\",0";
+            return $"\"{ExePath}\",0";
+        }
+    }
+
     public IReadOnlyList<AssociationResult> AssociateAll()
     {
         var results = new List<AssociationResult>();
 
-        // 尝试写入 HKCU（当前用户，通常无需管理员）
         try
         {
             RegisterProgId();
@@ -48,13 +63,17 @@ public sealed class FileAssociationService : IFileAssociationService
             try
             {
                 AssociateExtension(ext);
-                results.Add(new AssociationResult(ext, true, "已关联（若系统仍提示选择默认应用，请在“默认应用”中确认 lplayer）"));
+                results.Add(new AssociationResult(ext, true,
+                    "已关联（若系统仍提示选择应用，请在“默认应用”中确认；图标可能需稍后刷新）"));
             }
             catch (Exception ex)
             {
                 results.Add(new AssociationResult(ext, false, ex.Message));
             }
         }
+
+        // 通知 Explorer 刷新图标与关联
+        RefreshShellIcons();
 
         return results;
     }
@@ -78,11 +97,11 @@ public sealed class FileAssociationService : IFileAssociationService
 
         try
         {
-            // 删除 ProgID
             Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\{ProgId}", false);
         }
         catch { /* ignore */ }
 
+        RefreshShellIcons();
         return results;
     }
 
@@ -113,8 +132,11 @@ public sealed class FileAssociationService : IFileAssociationService
     {
         using var key = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{ProgId}");
         key.SetValue("", "lplayer 音频文件");
+
+        // 文件类型图标 → lplayer.ico（Explorer 会用此图显示关联文件）
         using var icon = key.CreateSubKey("DefaultIcon");
-        icon.SetValue("", $"\"{ExePath}\",0");
+        icon.SetValue("", IconLocation);
+
         using var shell = key.CreateSubKey("shell");
         using var open = shell.CreateSubKey("open");
         using var cmd = open.CreateSubKey("command");
@@ -123,8 +145,7 @@ public sealed class FileAssociationService : IFileAssociationService
 
     private static void RegisterOpenCommand()
     {
-        // 备用路径：Software\Classes 下扩展名直写（部分场景有效）
-        // UserChoice 受系统保护，无法直接覆盖；注册 ProgID 后引导用户确认。
+        // UserChoice 受系统保护；注册 ProgID + DefaultIcon 后由用户确认默认应用。
     }
 
     private static void AssociateExtension(string ext)
@@ -132,22 +153,24 @@ public sealed class FileAssociationService : IFileAssociationService
         if (!ext.StartsWith('.'))
             ext = "." + ext;
 
-        // 1) 扩展名 → ProgID
+        // 扩展名 → ProgID
         using (var extKey = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{ext}"))
         {
             extKey.SetValue("", ProgId);
         }
 
-        // 2) 扩展名 OpenWithProgids
+        // 扩展名图标（部分系统直接读这里）
+        using (var iconKey = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{ext}\DefaultIcon"))
+        {
+            iconKey.SetValue("", IconLocation);
+        }
+
+        // OpenWithProgids
         using (var openWith = Registry.CurrentUser.CreateSubKey(
                    $@"Software\Classes\{ext}\OpenWithProgids"))
         {
             openWith.SetValue(ProgId, Array.Empty<byte>());
         }
-
-        // 3) 尝试清理旧的 open 命令指向，让系统重新评估默认应用
-        // UserChoice 由 Windows 保护（Windows 8+ 使用 Hash），不能直接写。
-        // 通过注册 ProgID + 打开“打开方式”引导。
     }
 
     private static void DissociateExtension(string ext)
@@ -162,7 +185,7 @@ public sealed class FileAssociationService : IFileAssociationService
             var val = extKey?.GetValue("") as string;
             if (val != null && val.Equals(ProgId, StringComparison.OrdinalIgnoreCase))
             {
-                Registry.CurrentUser.DeleteSubKey(classesPath, false);
+                Registry.CurrentUser.DeleteSubKeyTree(classesPath, false);
             }
         }
         catch { /* ignore */ }
@@ -176,12 +199,26 @@ public sealed class FileAssociationService : IFileAssociationService
         catch { /* ignore */ }
     }
 
-    /// <summary>打开系统“默认应用 / 打开方式”设置页，引导用户确认关联。</summary>
+    [DllImport("shell32.dll")]
+    private static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
+
+    private const uint SHCNE_ASSOCCHANGED = 0x08000000;
+    private const uint SHCNF_IDLIST = 0x0000;
+
+    /// <summary>通知系统关联与图标已变化，促使资源管理器刷新。</summary>
+    public static void RefreshShellIcons()
+    {
+        try
+        {
+            SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, IntPtr.Zero, IntPtr.Zero);
+        }
+        catch { /* ignore */ }
+    }
+
     public static void OpenDefaultAppsSettings()
     {
         try
         {
-            // ms-settings:defaultapps — Windows 10/11 默认应用
             Process.Start(new ProcessStartInfo("ms-settings:defaultapps") { UseShellExecute = true });
         }
         catch
